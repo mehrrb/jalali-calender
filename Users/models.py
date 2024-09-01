@@ -8,6 +8,7 @@ class CustomUser(models.Model):
         (MALE, 'Male'),
         (FEMALE, 'Female'),
     ]
+
     username = models.CharField(max_length=256, unique=True)
     full_name = models.CharField(max_length=256)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default=MALE)
@@ -21,20 +22,12 @@ class CustomUser(models.Model):
         return {'first_name': first_name, 'last_name': last_name}
 
     def get_age(self):
-        birthday_jalali = jdatetime.date.fromgregorian(date=self.birthday_date)
-        today_jalali = jdatetime.date.today()
-        age = today_jalali.year - birthday_jalali.year
-        if (today_jalali.month, today_jalali.day) < (birthday_jalali.month, birthday_jalali.day):
+        today = jdatetime.date.today()
+        age = today.year - self.birthday_date.year
+        if today.month < self.birthday_date.month or (today.month == self.birthday_date.month and today.day < self.birthday_date.day):
             age -= 1
         return age
 
     def is_birthday(self):
-        today_jalali = jdatetime.date.today()
-        birthday_jalali = jdatetime.date.fromgregorian(date=self.birthday_date)
-        return today_jalali.month == birthday_jalali.month and today_jalali.day == birthday_jalali.day
-
-    def birthday_jalali(self):
-        return jdatetime.date.fromgregorian(date=self.birthday_date)
-
-    def ceremony_datetime_jalali(self):
-        return jdatetime.datetime.fromgregorian(datetime=self.ceremony_datetime)
+        today = jdatetime.date.today()
+        return today.day == self.birthday_date.day and today.month == self.birthday_date.month
